@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/product.dart';
+import './product.dart';
 
 class ProductProvider with ChangeNotifier {
   List<Product> _item = [
@@ -37,8 +37,34 @@ class ProductProvider with ChangeNotifier {
     ),
   ];
 
+//manage state this way can affect app-wide state where we don't want to update
+//instead, we cam use stateful widget in products_overview_screen
+  // var _showFavoritesOnly = false;
+
+  // void showFavoritesOnly() {
+  //   _showFavoritesOnly = true;
+  //   notifyListeners();
+  // }
+
+  // void showAll() {
+  //   _showFavoritesOnly = false;
+  //   notifyListeners();
+  // }
+
+  Product findById(String id) {
+    return _item.firstWhere((element) => element.id == id);
+  }
+
   List<Product> get items {
+    // if (_showFavoritesOnly) {
+    //   return _item.where((element) => element.isFavorite).toList();
+    // } else {
     return [..._item];
+    //}
+  }
+
+  List<Product> get favoritesItem {
+    return _item.where((element) => element.isFavorite).toList();
   }
 
   void addProduct() {
