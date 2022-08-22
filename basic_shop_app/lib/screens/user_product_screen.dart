@@ -3,9 +3,11 @@ import 'package:provider/provider.dart';
 
 import '../providers/product_provider.dart';
 import '../widgets/user_product_item.dart';
+import '../widgets/app_drawer.dart';
+import '../screens/edit_product_screen.dart';
 
 class UserProductScreen extends StatelessWidget {
-  static const routeName = '/user_product';
+  static const routeName = '/user-products';
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +15,25 @@ class UserProductScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My products'),
+        title: const Text('My Products'),
         actions: <Widget>[
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(EditProductScreen.routeName);
+            },
             icon: const Icon(Icons.add),
-          ),
+          )
         ],
       ),
+      drawer: AppDrawer(),
       body: Padding(
         padding: EdgeInsets.all(8),
         child: ListView.builder(
-          itemBuilder: (_, i) => UserProductItem(
-              productData.items[i].title, productData.items[i].imageUrl),
+          itemBuilder: (_, i) => Column(children: [
+            UserProductItem(
+                productData.items[i].title, productData.items[i].imageUrl),
+            Divider()
+          ]),
           itemCount: productData.items.length,
         ),
       ),
