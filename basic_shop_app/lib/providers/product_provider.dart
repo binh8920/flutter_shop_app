@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import './product.dart';
 
@@ -67,7 +69,30 @@ class ProductProvider with ChangeNotifier {
     return _item.where((element) => element.isFavorite).toList();
   }
 
-  void addProduct() {
+  void addProduct(Product product) {
+    final newProduct = Product(
+        id: DateTime.now().toString(),
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl);
+
+    _item.add(newProduct);
+    notifyListeners();
+  }
+
+  void updateProduct(String productId, Product newProduct) {
+    final productIndex = _item.indexWhere((element) => element.id == productId);
+    if (productIndex >= 0) {
+      _item[productIndex] = newProduct;
+      notifyListeners();
+    } else {
+      print('...');
+    }
+  }
+
+  void deleteProduct(String id) {
+    _item.removeWhere((element) => element.id == id);
     notifyListeners();
   }
 }
