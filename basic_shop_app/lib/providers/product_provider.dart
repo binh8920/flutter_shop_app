@@ -72,27 +72,35 @@ class ProductProvider with ChangeNotifier {
     return _item.where((element) => element.isFavorite).toList();
   }
 
-  void addProduct(Product product) {
-    final url = Uri.https(
-        'flutter-shop-6c05c-default-rtdb.firebaseio.com', '/products.json');
-    http.post(url,
-        body: json.encode({
-          'title': product.title,
-          'description': product.description,
-          'imageUrl': product.imageUrl,
-          'price': product.price,
-          'isFavorite': product.isFavorite,
-        }));
+  Future<void> addProduct(Product product) {
+    final url = Uri.parse(
+        'https://flutter-shop-6c05c-default-rtdb.firebaseio.com/products.json');
+    return http
+        .post(
+      url,
+      body: json.encode({
+        'title': product.title,
+        'description': product.description,
+        'imageUrl': product.imageUrl,
+        'price': product.price,
+        'isFavorite': product.isFavorite,
+      }),
+    )
+        .then((value) {
+      print(value.body);
+      final newProduct = Product(
+          id: json.decode(value.body)['name'],
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.imageUrl);
 
-    final newProduct = Product(
-        id: DateTime.now().toString(),
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        imageUrl: product.imageUrl);
-
-    _item.add(newProduct);
-    notifyListeners();
+      _item.add(newProduct);
+      //_item.insert(0, newProduct);
+      notifyListeners();
+    }).catchError((error) {
+      throw error;
+    });
   }
 
   void updateProduct(String productId, Product newProduct) {
