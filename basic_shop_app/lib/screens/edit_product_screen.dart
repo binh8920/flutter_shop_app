@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 import '../providers/product.dart';
 import '../providers/product_provider.dart';
@@ -76,7 +77,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     final isValid = _form.currentState?.validate();
     if (isValid != null && isValid == false) {
       return;
@@ -95,30 +96,31 @@ class _EditProductScreenState extends State<EditProductScreen> {
       });
       Navigator.of(context).pop();
     } else {
-      Provider.of<ProductProvider>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((error) {
-        return showDialog<Null>(
+      try {
+        await Provider.of<ProductProvider>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
+        await showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: Text('An error has occurred!'),
-            content: Text(error.toString()),
+            title: Text('An error occurred!'),
+            content: Text('Something went wrong.'),
             actions: <Widget>[
               FlatButton(
+                child: Text('Okay'),
                 onPressed: () {
                   Navigator.of(ctx).pop();
                 },
-                child: Text('Okay'),
               )
             ],
           ),
         );
-      }).then((value) {
+      } finally {
         setState(() {
           _isLoading = false;
         });
         Navigator.of(context).pop();
-      });
+      }
     }
 
     //Navigator.of(context).pop();

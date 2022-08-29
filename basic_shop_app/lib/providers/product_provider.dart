@@ -72,35 +72,45 @@ class ProductProvider with ChangeNotifier {
     return _item.where((element) => element.isFavorite).toList();
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     final url = Uri.parse(
         'https://flutter-shop-6c05c-default-rtdb.firebaseio.com/products.json');
-    return http
-        .post(
-      url,
-      body: json.encode({
-        'title': product.title,
-        'description': product.description,
-        'imageUrl': product.imageUrl,
-        'price': product.price,
-        'isFavorite': product.isFavorite,
-      }),
-    )
-        .then((value) {
-      print(value.body);
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+          'isFavorite': product.isFavorite,
+        }),
+      );
       final newProduct = Product(
-          id: json.decode(value.body)['name'],
-          title: product.title,
-          description: product.description,
-          price: product.price,
-          imageUrl: product.imageUrl);
-
+        id: json.decode(response.body)['name'],
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+      );
       _item.add(newProduct);
-      //_item.insert(0, newProduct);
+      // _items.insert(0, newProduct); // at the start of the list
       notifyListeners();
-    }).catchError((error) {
+    } catch (error) {
+      print(error);
       throw error;
-    });
+    }
+  }
+
+  Future<void> fetchAndSetProducts() async {
+    final url = Uri.parse(
+        'https://flutter-shop-6c05c-default-rtdb.firebaseio.com/products.json');
+
+    try {
+      final response = await http.get(url);
+    } catch (error) {
+      throw (error);
+    }
   }
 
   void updateProduct(String productId, Product newProduct) {
